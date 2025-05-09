@@ -1,0 +1,17 @@
+# Ignore all files in models directory except Model.php
+app/models/*
+!app/models/Model.php
+
+# Ignore all migrations
+app/database/migrations/*
+
+# Ignore all controllers except Controller.php
+app/controllers/*
+!app/controllers/Controller.php
+
+# Common ignores
+/vendor/
+.env
+.env.backup
+.phpunit.result.cache
+composer.lock 

@@ -5,6 +5,7 @@ use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
 use App\Config\Database;
 use App\Middleware\Middleware;
+use App\Middleware\TrailingSlashMiddleware;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -24,6 +25,9 @@ $logErrors = true;
 $logErrorDetails = $_ENV['APP_ENV'] === 'development';
 
 $app->addErrorMiddleware($displayErrorDetails, $logErrors, $logErrorDetails);
+
+// Add middleware in the correct order
+$app->add(new TrailingSlashMiddleware());
 $app->add(new Middleware());
 $app->addBodyParsingMiddleware();
 
