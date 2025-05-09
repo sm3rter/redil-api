@@ -31,6 +31,12 @@ $app->add(new TrailingSlashMiddleware());
 $app->add(new Middleware());
 $app->addBodyParsingMiddleware();
 
+// Register Facades
+App\Facades\Request::setFacadeApplication($app->getContainer());
+App\Facades\Response::setFacadeApplication($app->getContainer());
+App\Facades\Auth::setFacadeApplication($app->getContainer());
+App\Facades\DB::setFacadeApplication($app->getContainer());
+
 require __DIR__ . '/../app/routes.php';
 
 $app->run(); 
