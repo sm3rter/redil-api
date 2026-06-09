@@ -4,152 +4,55 @@
 require __DIR__ . '/vendor/autoload.php';
 
 use Dotenv\Dotenv;
+use Framework\Logger\Logger;
 use App\Config\Database;
+use App\Console\CommandKernel;
+use App\Console\Output;
+use App\Commands\{
+    StartCommand,
+    KeyGenerateCommand,
+    MigrateCommand,
+    RollbackCommand,
+    MigrateStatusCommand,
+    MakeMigrationCommand,
+    MakeModelCommand,
+    MakeControllerCommand,
+    HelpCommand
+};
 
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-Database::init();
-
-$command = $argv[1] ?? null;
-
-if (!$command) {
-    echo "Available commands:\n";
-    echo "  start          Start the development server\n";
-    echo "  migrate        Run database migrations\n";
-    echo "  make:migration Create a new migration file\n";
-    echo "  make:model     Create a new model\n";
-    echo "  make:controller Create a new controller\n";
+try {
+    Database::init();
+} catch (\Throwable $e) {
+    Logger::exception($e, Logger::CRITICAL);
+    Output::error('Database initialization failed: ' . $e->getMessage());
     exit(1);
 }
 
-switch ($command) {
-    case 'start':
-        $host = $argv[2] ?? '127.0.0.1';
-        $port = $argv[3] ?? '8000';
-        echo "Starting development server at http://$host:$port\n";
-        echo "Press Ctrl+C to stop the server\n";
-        exec("php -S $host:$port -t public");
-        break;
+$kernel = new CommandKernel();
 
-    case 'migrate':
-        $migrations = glob(__DIR__ . '/app/database/migrations/*.php');
-        foreach ($migrations as $migration) {
-            echo "Running migration: " . basename($migration) . "\n";
-            require $migration;
-        }
-        echo "\nAll migrations completed!\n";
-        break;
+$kernel->register(new StartCommand());
+$kernel->register(new KeyGenerateCommand());
+$kernel->register(new MigrateCommand());
+$kernel->register(new RollbackCommand());
+$kernel->register(new MigrateStatusCommand());
+$kernel->register(new MakeMigrationCommand());
+$kernel->register(new MakeModelCommand());
+$kernel->register(new MakeControllerCommand());
+$kernel->register(new HelpCommand());
 
-    case 'make:migration':
-        if (!isset($argv[2])) {
-            echo "Error: Migration name required\n";
-            echo "Usage: php redil make:migration create_table_name_table\n";
-            exit(1);
-        }
-        $name = $argv[2];
-        $filename = date('Y_m_d_His') . '_' . $name . '.php';
-        $content = <<<PHP
-<?php
-
-use Illuminate\Database\Capsule\Manager as Capsule;
+$command  = $argv[1] ?? 'help';
+$args     = array_slice($argv, 2);
+$exitCode = 0;
 
 try {
-    if (!Capsule::schema()->hasTable('table_name')) {
-        Capsule::schema()->create('table_name', function (\$table) {
-            \$table->increments('id');
-            \$table->timestamps();
-        });
-        echo "Table created successfully!\n";
-    } else {
-        echo "Table already exists.\n";
-    }
-} catch (\Exception \$e) {
-    echo "Error: " . \$e->getMessage() . "\n";
+    $exitCode = $kernel->call($command, $args);
+} catch (\Throwable $e) {
+    Logger::exception($e, Logger::CRITICAL);
+    Output::error($e->getMessage());
+    $exitCode = 1;
 }
-PHP;
-        file_put_contents(__DIR__ . '/app/database/migrations/' . $filename, $content);
-        echo "Migration file created: $filename\n";
-        break;
 
-    case 'make:model':
-        if (!isset($argv[2])) {
-            echo "Error: Model name required\n";
-            echo "Usage: php redil make:model ModelName\n";
-            exit(1);
-        }
-        $name = $argv[2];
-        $filename = __DIR__ . '/app/models/' . $name . '.php';
-        $tableName = strtolower($name) . 's';
-        $content = <<<PHP
-<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class $name extends Model
-{
-    protected \$table = '$tableName';
-    
-    protected \$fillable = [
-        // Add your fillable fields here
-    ];
-}
-PHP;
-        file_put_contents($filename, $content);
-        echo "Model created: $name.php\n";
-        break;
-
-    case 'make:controller':
-        if (!isset($argv[2])) {
-            echo "Error: Controller name required\n";
-            echo "Usage: php redil make:controller ControllerName\n";
-            exit(1);
-        }
-        $name = $argv[2];
-        $filename = __DIR__ . '/app/controllers/' . $name . 'Controller.php';
-        $content = <<<PHP
-<?php
-
-namespace App\Controllers;
-
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-
-class {$name}Controller extends Controller
-{
-    public function index(Request \$request, Response \$response): Response
-    {
-        return \$this->jsonResponse(\$response, ['message' => 'Index method']);
-    }
-
-    public function show(Request \$request, Response \$response, array \$args): Response
-    {
-        return \$this->jsonResponse(\$response, ['message' => 'Show method']);
-    }
-
-    public function store(Request \$request, Response \$response): Response
-    {
-        return \$this->jsonResponse(\$response, ['message' => 'Store method']);
-    }
-
-    public function update(Request \$request, Response \$response, array \$args): Response
-    {
-        return \$this->jsonResponse(\$response, ['message' => 'Update method']);
-    }
-
-    public function delete(Request \$request, Response \$response, array \$args): Response
-    {
-        return \$this->jsonResponse(\$response, ['message' => 'Delete method']);
-    }
-}
-PHP;
-        file_put_contents($filename, $content);
-        echo "Controller created: {$name}Controller.php\n";
-        break;
-
-    default:
-        echo "Unknown command: $command\n";
-        exit(1);
-} 
+exit($exitCode);

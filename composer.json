@@ -11,7 +11,13 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/"
-        }
+            "App\\": "app/",
+            "App\\Bootstrap\\": "framework/bootstrap/",
+            "Framework\\": "framework/"
+        },
+        "files": [
+            "framework/helpers.php",
+            "framework/api_helpers.php"
+        ]
     }
-} 
+}

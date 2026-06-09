@@ -5,6 +5,12 @@ namespace App\Facades;
 abstract class Facade
 {
     protected static $resolvedInstance = [];
+    protected static $app = null;
+
+    public static function setFacadeApplication($container)
+    {
+        static::$app = $container;
+    }
 
     public static function getFacadeRoot()
     {
@@ -24,6 +30,10 @@ abstract class Facade
 
         if (isset(static::$resolvedInstance[$name])) {
             return static::$resolvedInstance[$name];
+        }
+
+        if (static::$app && static::$app->has($name)) {
+            return static::$resolvedInstance[$name] = static::$app->get($name);
         }
 
         return static::$resolvedInstance[$name] = new $name();
