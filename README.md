@@ -112,4 +112,4 @@ redil-api/
     └── vendor/               # Composer packages
 ```
 
-See [framework/docs/STRUCTURE.md](./framework/docs/STRUCTURE.md) for details.
+See [framework/docs/STRUCTURE.md](./framework/docs/STRUCTURE.md) for details and [framework/docs/DEPLOYMENT.md](./framework/docs/DEPLOYMENT.md) for Apache/nginx setup and the production checklist.

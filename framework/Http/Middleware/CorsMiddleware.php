@@ -7,6 +7,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Psr7\Response as SlimResponse;
 
 class CorsMiddleware implements MiddlewareInterface
 {
@@ -22,7 +23,10 @@ class CorsMiddleware implements MiddlewareInterface
         $origin = $request->getHeaderLine('Origin');
         $allowOrigin = in_array('*', $allowOrigins, true) ? '*' : (in_array($origin, $allowOrigins, true) ? $origin : '');
 
-        $response = $handler->handle($request);
+        // Preflight is answered here (no route needed); everything else goes down the stack
+        $response = $request->getMethod() === 'OPTIONS'
+            ? new SlimResponse(204)
+            : $handler->handle($request);
 
         if ($allowOrigin) {
             $response = $response
@@ -31,10 +35,6 @@ class CorsMiddleware implements MiddlewareInterface
                 ->withHeader('Access-Control-Allow-Headers', implode(', ', $allowHeaders))
                 ->withHeader('Access-Control-Allow-Credentials', $allowCredentials)
                 ->withHeader('Access-Control-Max-Age', (string) $maxAge);
-        }
-
-        if ($request->getMethod() === 'OPTIONS') {
-            $response = $response->withStatus(204);
         }
 
         return $response;

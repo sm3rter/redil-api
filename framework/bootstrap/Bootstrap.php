@@ -109,9 +109,6 @@ class Bootstrap
     {
         $app       = $this->app;
 
-        // CORS preflight: answered by CorsMiddleware (204 + headers) for any path
-        $app->options('/{routes:.+}', fn ($request, $response) => $response);
-
         $routesDir = __DIR__ . '/../../routes';
 
         foreach (glob($routesDir . '/*.php') as $routeFile) {

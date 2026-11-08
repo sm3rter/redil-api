@@ -1,0 +1,15 @@
+# Use this file only when the web server's document root is the PROJECT ROOT
+# (typical shared hosting / cPanel). If the document root is public/, it is not needed.
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Never serve internals: dotfiles (except .well-known), source, config, vendor, logs, CLI
+    RewriteRule ^\.(?!well-known/) - [F,L]
+    RewriteRule ^(app|config|routes|framework)(/|$) - [F,L]
+    RewriteRule ^(composer\.(json|lock)|redil|README\.md)$ - [F,L]
+
+    # Everything else goes to public/
+    RewriteRule ^(?!public/)(.*)$ public/$1 [L]
+</IfModule>

@@ -32,6 +32,14 @@ class ErrorHandler
             }
 
             $exception = new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+
+            // Deprecations and notices are logged only: they must not turn a working request into a 500.
+            if (in_array($errno, [E_DEPRECATED, E_USER_DEPRECATED, E_NOTICE, E_USER_NOTICE], true)) {
+                Logger::exception($exception, Logger::WARNING);
+                return true;
+            }
+
+            // Warnings and real errors still become exceptions.
             Logger::exception($exception, Logger::WARNING);
             throw $exception;
         });
