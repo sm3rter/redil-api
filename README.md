@@ -68,7 +68,7 @@ php redil make:migration create_users_table
 - Supports batching and rollback
 - Works just like Laravel's migration system
 
-See [MIGRATIONS.md](./MIGRATIONS.md) for detailed documentation.
+See [MIGRATIONS.md](./framework/docs/MIGRATIONS.md) for detailed documentation.
 
 ## Available Commands
 
@@ -87,101 +87,29 @@ See [MIGRATIONS.md](./MIGRATIONS.md) for detailed documentation.
 - `php redil start` - Start development server
 - `php redil help` - Show help
 
-See [CLI_COMMANDS.md](./CLI_COMMANDS.md) for more details.
+See [CLI_COMMANDS.md](./framework/docs/CLI_COMMANDS.md) for more details.
 
 ## Project Structure
 
+Everything you edit daily is outside `framework/`; the engine lives inside it.
+
 ```
 redil-api/
-├── app/                          # Application code (edit these)
-│   ├── commands/                 # CLI commands
-│   ├── controllers/              # API controllers
-│   ├── models/                   # Database models
-│   ├── middleware/               # Request middleware
-│   ├── config/                   # App configuration
-│   ├── database/
-│   │   ├── migrations/           # Database migrations
-│   │   └── seeders/              # Database seeders
-│   └── facades/                  # Facade classes
-│
-├── framework/                    # Framework core (rarely edited)
-│   ├── vendor/                   # Composer dependencies
-│   ├── bootstrap/                # Framework bootstrap
-│   └── Database/                 # Framework utilities
-│       └── MigrationManager.php  # Migration tracking
-│
-├── config/                       # Configuration files
-├── routes/                       # API routes
-├── public/                       # Web root (index.php)
-├── composer.json                 # Dependencies
-├── redil                         # CLI entry point
-├── MIGRATIONS.md                 # Migration guide
-└── STRUCTURE.md                  # Structure documentation
+├── app/
+│   ├── controllers/          # API controllers
+│   ├── models/               # Eloquent models
+│   ├── middleware/           # Your custom middleware
+│   └── database/migrations/  # Migrations
+├── config/                   # app, cors, db, security
+├── routes/api.php            # Routes
+├── public/index.php          # Web root
+├── redil                     # CLI
+├── .env.example
+└── framework/                # Engine (rarely edited)
+    ├── Bootstrap/  Config/  Console/  Database/  Facades/
+    ├── Http/ (Controller + Middleware)  Logger/  Support/ (helpers)
+    ├── docs/                 # STRUCTURE, CLI_COMMANDS, MIGRATIONS, ...
+    └── vendor/               # Composer packages
 ```
 
-**Key Points:**
-- `/app` contains your application code - edit these files
-- `/framework` contains framework internals - rarely modified
-- Framework files are organized separately to keep your project clean
-
-See [STRUCTURE.md](./STRUCTURE.md) for detailed structure information.
-
-## API Documentation
-
-The API follows RESTful principles and returns JSON responses. All endpoints are prefixed with `/api`.
-
-### Response Format
-
-Success Response:
-```json
-{
-    "status": "success",
-    "data": {
-        // Response data
-    }
-}
-```
-
-Error Response:
-```json
-{
-    "status": "error",
-    "message": "Error message"
-}
-```
-
-## Getting Started
-
-1. **Create your first migration:**
-   ```bash
-   php redil make:migration create_posts_table
-   ```
-
-2. **Edit the migration** in `app/database/migrations/`
-
-3. **Run migrations:**
-   ```bash
-   php redil migrate
-   ```
-
-4. **Create a model:**
-   ```bash
-   php redil make:model Post
-   ```
-
-5. **Create a controller:**
-   ```bash
-   php redil make:controller PostController
-   ```
-
-6. **Define routes** in `routes/api.php`
-
-## Documentation
-
-- [Migrations Guide](./MIGRATIONS.md) - Complete migration system documentation
-- [Project Structure](./STRUCTURE.md) - Project structure and organization
-- [CLI Commands](./CLI_COMMANDS.md) - All available CLI commands
-
-## License
-
-MIT License
+See [framework/docs/STRUCTURE.md](./framework/docs/STRUCTURE.md) for details.

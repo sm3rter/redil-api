@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Bootstrap;
+namespace Framework\Bootstrap;
 
 use Framework\Logger\Logger;
 use Slim\Exception\HttpException;

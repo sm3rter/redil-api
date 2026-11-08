@@ -11,13 +11,18 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/",
-            "App\\Bootstrap\\": "framework/bootstrap/",
-            "Framework\\": "framework/"
+            "Framework\\": "framework/",
+            "App\\Controllers\\": "app/controllers/",
+            "App\\Models\\": "app/models/",
+            "App\\Middleware\\": "app/middleware/",
+            "App\\": "app/"
         },
         "files": [
-            "framework/helpers.php",
-            "framework/api_helpers.php"
+            "framework/Support/helpers.php",
+            "framework/Support/api_helpers.php"
         ]
+    },
+    "config": {
+        "vendor-dir": "framework/vendor"
     }
 }

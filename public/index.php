@@ -1,5 +1,5 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../framework/vendor/autoload.php';
 
-((new \App\Bootstrap\Bootstrap())->bootstrap())->run(); 
+((new \Framework\Bootstrap\Bootstrap())->bootstrap())->run(); 

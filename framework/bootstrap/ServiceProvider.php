@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Bootstrap;
+namespace Framework\Bootstrap;
 
 use Psr\Container\ContainerInterface;
 
@@ -11,9 +11,9 @@ class ServiceProvider
      */
     public static function registerFacades(ContainerInterface $container)
     {
-        \App\Facades\Request::setFacadeApplication($container);
-        \App\Facades\Response::setFacadeApplication($container);
-        \App\Facades\Auth::setFacadeApplication($container);
-        \App\Facades\DB::setFacadeApplication($container);
+        \Framework\Facades\Request::setFacadeApplication($container);
+        \Framework\Facades\Response::setFacadeApplication($container);
+        \Framework\Facades\Auth::setFacadeApplication($container);
+        \Framework\Facades\DB::setFacadeApplication($container);
     }
 }

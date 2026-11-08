@@ -1,0 +1,3 @@
+.env
+framework/logs/*.log
+framework/logs/*.log.*

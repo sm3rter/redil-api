@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Bootstrap;
+namespace Framework\Bootstrap;
 
 use DI\Container;
 use Slim\Factory\AppFactory;
 use Dotenv\Dotenv;
-use App\Config\Database;
-use App\Config\Config;
-use App\Middleware\Middleware;
-use App\Middleware\TrailingSlashMiddleware;
-use App\Bootstrap\Middleware\CorsMiddleware;
-use App\Bootstrap\Middleware\RateLimitMiddleware;
-use App\Bootstrap\Middleware\SecurityHeadersMiddleware;
-use App\Middleware\RequestValidationMiddleware;
+use Framework\Database\Database;
+use Framework\Config\Config;
+use Framework\Http\Middleware\TrailingSlashMiddleware;
+use Framework\Http\Middleware\CorsMiddleware;
+use Framework\Http\Middleware\RateLimitMiddleware;
+use Framework\Http\Middleware\SecurityHeadersMiddleware;
+use Framework\Http\Middleware\RequestValidationMiddleware;
 
 class Bootstrap
 {
@@ -98,18 +97,21 @@ class Bootstrap
         $this->app->add(new CorsMiddleware());
         $this->app->add(new SecurityHeadersMiddleware());
         $this->app->add(new RateLimitMiddleware(
-            config('app.rate_limit', 100),
-            config('app.rate_window', 60)
+            config('security.rate_limit', 60),
+            config('security.rate_window', 60)
         ));
         $this->app->addBodyParsingMiddleware();
         $this->app->add(new RequestValidationMiddleware());
         $this->app->add(new TrailingSlashMiddleware());
-        $this->app->add(new Middleware());
     }
 
     private function loadRoutes()
     {
         $app       = $this->app;
+
+        // CORS preflight: answered by CorsMiddleware (204 + headers) for any path
+        $app->options('/{routes:.+}', fn ($request, $response) => $response);
+
         $routesDir = __DIR__ . '/../../routes';
 
         foreach (glob($routesDir . '/*.php') as $routeFile) {
